@@ -33,7 +33,7 @@ let timeSlots = {
 
 // npx playwright codegen https://hawspets.givecloud.co/dog-park
 async function scrapePark(url:string){ 
-    let days = []
+    let days:any = []
     
     const browser = await playwright.chromium.launch({
         headless: true,//true == no ui
@@ -61,7 +61,7 @@ async function scrapePark(url:string){
             days.push({
                 sold_out: soldOutArr[i].trim() === "SOLD OUT"? true: false,
                 date: date,
-                index: i,
+                // index: i,
                 url: await page.locator('.product-grid-item .feature-image').nth(i).getAttribute('href')
             })
         }
@@ -69,15 +69,25 @@ async function scrapePark(url:string){
     }
 
     console.log(days)
-    let daysTimes = days.forEach(async ({ sold_out, date, index, url }) => {
+    let daysTimes = days.forEach(async ({ sold_out, date, url }) => {
         if(!sold_out){
-            // await scrapeTimes(url)
+            let times = await scrapeTimes(url)
+            // days[index]['times'] = times;
+            return {
+                sold_out,
+                date,
+                url,
+                times
+            }
             //function to scrape times from website
+            //add the times to the object we have
         }
     })
 
+    console.log(daysTimes)
     console.log('done scraping')
 }
+
 function cleanTimes(arr:string[]){
     let slot:any= {}
     arr.map((el:string)=>{
@@ -89,7 +99,7 @@ function cleanTimes(arr:string[]){
     return slot
 }
 
-async function scrapeTimes(url:string|null):Promise<number[]>{
+async function scrapeTimes(url:string|null):Promise<any>{
     if(url){
     const browser = await playwright.chromium.launch({
         headless: true,//true == no ui
@@ -100,10 +110,13 @@ async function scrapeTimes(url:string|null):Promise<number[]>{
     //get rid of pop up modal
     await page.getByRole('button', { name: 'Close' }).click();
 
-    //so what do we need?
-    //get all of the available dates
+    //gets all of the available dates
+    let foo = cleanTimes(await page.locator('.product-add-to-cart .product-options .custom-control .custom-control-label').allInnerTexts())
+    //foo needs to be added to the object
 
-    console.log(await page.locator('.product-add-to-cart .product-options .custom-control .custom-control-label').allInnerTexts())
+    browser.close()
+    return foo
+    console.log(foo);
 
 //   await page.getByText('7:00-7:45 PM $').click();
 //   await page.getByRole('button', { name: ' Add to Cart' }).click();
@@ -124,19 +137,25 @@ async function scrapeTimes(url:string|null):Promise<number[]>{
 }
 
 async function run(){
-//    await scrapeTimes('https://hawspets.givecloud.co/product/SCADPAPR222024/sca-private-dog-park-april-22')
-    // await scrapePark('https://hawspets.givecloud.co/dog-park')
+   await scrapeTimes('https://hawspets.givecloud.co/product/SCADPAPR222024/sca-private-dog-park-april-22')
+   // await scrapePark('https://hawspets.givecloud.co/dog-park')
 }
 
 run();
-console.log(cleanTimes([
-    '8:00-8:45 AM\n\n$20.00 (Booked)',
-    '9:00-9:45 AM\n\n$20.00 (Booked)',
-    '10:00 AM - 10:45AM\n\n$20.00 (Booked)',
-    '11:00 - 11:45 AM\n\n$20.00 (Booked)',
-    '3:00PM-3:45 PM\n\n$20.00 (Booked)',
-    '4:00-4:45 PM\n\n$20.00 (Booked)',
-    '5:00-5:45 PM\n\n$20.00 (Booked)',
-    '6:00-6:45 PM\n\n$20.00 (Booked)',
-    '7:00-7:45 PM\n\n$20.00'
-  ]))
+// console.log(cleanTimes([
+//     '8:00-8:45 AM\n\n$20.00 (Booked)',
+//     '9:00-9:45 AM\n\n$20.00 (Booked)',
+//     '10:00 AM - 10:45AM\n\n$20.00 (Booked)',
+//     '11:00 - 11:45 AM\n\n$20.00 (Booked)',
+//     '3:00PM-3:45 PM\n\n$20.00 (Booked)',
+//     '4:00-4:45 PM\n\n$20.00 (Booked)',
+//     '5:00-5:45 PM\n\n$20.00 (Booked)',
+//     '6:00-6:45 PM\n\n$20.00 (Booked)',
+//     '7:00-7:45 PM\n\n$20.00'
+//   ]))
+
+
+//todos
+//add the times to the array of dates
+//figure out how to actually book the shit
+//how to book with an array of days?
