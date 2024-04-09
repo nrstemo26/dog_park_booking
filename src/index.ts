@@ -81,14 +81,10 @@ async function scrapePark(url:string){
 function cleanTimes(arr:string[]){
     let slot:any= {}
     arr.map((el:string)=>{
-        // return el
         const [timeRange, status] = el.split('\n\n'); // Splitting the string into time range and status
         const isBooked = status.includes('(Booked)'); // Checking if the status includes '(Booked)'
         const formattedTimeRange = timeRange.replace(/\s+/g, ''); // Removing whitespace from the time range
-
-    // Adding a property to the object based on the time range with a boolean value indicating booked status
         slot[formattedTimeRange] = { booked: isBooked };
-        // return el.replaceAll('\n','').split('$20.00')
     })
     return slot
 }
