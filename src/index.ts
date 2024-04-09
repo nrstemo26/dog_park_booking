@@ -69,22 +69,18 @@ async function scrapePark(url:string){
     }
 
     console.log(days)
-    let daysTimes = days.forEach(async ({ sold_out, date, url }) => {
-        if(!sold_out){
-            let times = await scrapeTimes(url)
-            // days[index]['times'] = times;
-            return {
-                sold_out,
-                date,
-                url,
+    for(let i = 0; i< days.length; i++){
+        let day = days[i];
+        if(!day.sold_out){
+            let times = await scrapeTimes(day.url)
+            days[i] = {
+                ...days[i],
                 times
             }
-            //function to scrape times from website
-            //add the times to the object we have
         }
-    })
+    }
 
-    console.log(daysTimes)
+    console.log(days)
     console.log('done scraping')
 }
 
@@ -100,6 +96,7 @@ function cleanTimes(arr:string[]){
 }
 
 async function scrapeTimes(url:string|null):Promise<any>{
+    console.log('scraping times,')
     if(url){
     const browser = await playwright.chromium.launch({
         headless: true,//true == no ui
@@ -113,10 +110,10 @@ async function scrapeTimes(url:string|null):Promise<any>{
     //gets all of the available dates
     let foo = cleanTimes(await page.locator('.product-add-to-cart .product-options .custom-control .custom-control-label').allInnerTexts())
     //foo needs to be added to the object
+    console.log(foo);
 
     browser.close()
     return foo
-    console.log(foo);
 
 //   await page.getByText('7:00-7:45 PM $').click();
 //   await page.getByRole('button', { name: ' Add to Cart' }).click();
@@ -137,8 +134,8 @@ async function scrapeTimes(url:string|null):Promise<any>{
 }
 
 async function run(){
-   await scrapeTimes('https://hawspets.givecloud.co/product/SCADPAPR222024/sca-private-dog-park-april-22')
-   // await scrapePark('https://hawspets.givecloud.co/dog-park')
+//    await scrapeTimes('https://hawspets.givecloud.co/product/SCADPAPR222024/sca-private-dog-park-april-22')
+   await scrapePark('https://hawspets.givecloud.co/dog-park')
 }
 
 run();
