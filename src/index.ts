@@ -1,8 +1,37 @@
 import playwright from 'playwright'
 
+let timeSlots = {
+    '8:00-8:45AM':{
+        available: false
+    },
+    '9:00-9:45AM':{
+        available: false
+    },
+    '10:00-10:45AM':{
+        available: false
+    },
+    '11:00-11:45AM':{
+        available: false
+    },
+    '3:00-3:45PM':{
+        available: false
+    },
+    '4:00-4:45PM':{
+        available: false
+    },
+    '5:00-5:45PM':{
+        available: false
+    },
+    '6:00-6:45PM':{
+        available: false
+    },
+    '7:00-7:45PM':{
+        available: false
+    },
+ }
+
+
 // npx playwright codegen https://hawspets.givecloud.co/dog-park
-
-
 async function scrapePark(url:string){ 
     let days = []
     
@@ -20,6 +49,7 @@ async function scrapePark(url:string){
     
     let cardCount = await page.locator('.product-grid-item').count()
     
+
     for(let i = 0; i<cardCount; i++){
         let date;
         
@@ -39,42 +69,78 @@ async function scrapePark(url:string){
     }
 
     console.log(days)
-    //so now we can loop thru
-    //get all dates
-    //probably use nth(4)
-
-
-    // let allDays = await page.locator('.product-grid-item').allInnerTexts()
-    // console.log(allDays)
-
-    // okay can I get
-    // get every card because i need to: 
-    // see if its sold out
-    // get the date and the view day to click and find time zones available
-
-    //product-grid-item
-    //get every card
-    //check for sold out text
-    //if it doesn't ahve sold out text
-    //then check what time slots it has?
-
-    // await page.locator('div').filter({ hasText: 'SOLD OUT SCA Private Dog Park | April 10 Dog Park $20.00 Add to Cart View' }).nth(3).click();
-    // await page.locator('div:nth-child(2) > .product-grid-item > div > .card-flags > .flag-secondary').click();
-
-    //get rid of popup
-    //modal-content 
-    //aria-label "Close"
-    // await page.locator('modal-content close').click()
-    // await page.locator('modal-content close').getByRole('button',{name:''})
-    //get all product-grid-item
-
-    //get sold out banner
+    let daysTimes = days.forEach(async ({ sold_out, date, index, url }) => {
+        if(!sold_out){
+            // await scrapeTimes(url)
+            //function to scrape times from website
+        }
+    })
 
     console.log('done scraping')
 }
+function cleanTimes(arr:string[]){
+    let slot:any= {}
+    arr.map((el:string)=>{
+        // return el
+        const [timeRange, status] = el.split('\n\n'); // Splitting the string into time range and status
+        const isBooked = status.includes('(Booked)'); // Checking if the status includes '(Booked)'
+        const formattedTimeRange = timeRange.replace(/\s+/g, ''); // Removing whitespace from the time range
+
+    // Adding a property to the object based on the time range with a boolean value indicating booked status
+        slot[formattedTimeRange] = { booked: isBooked };
+        // return el.replaceAll('\n','').split('$20.00')
+    })
+    return slot
+}
+
+async function scrapeTimes(url:string|null):Promise<number[]>{
+    if(url){
+    const browser = await playwright.chromium.launch({
+        headless: true,//true == no ui
+    })
+    const page = await browser.newPage();
+    await page.goto(url);
+
+    //get rid of pop up modal
+    await page.getByRole('button', { name: 'Close' }).click();
+
+    //so what do we need?
+    //get all of the available dates
+
+    console.log(await page.locator('.product-add-to-cart .product-options .custom-control .custom-control-label').allInnerTexts())
+
+//   await page.getByText('7:00-7:45 PM $').click();
+//   await page.getByRole('button', { name: ' Add to Cart' }).click();
+//   await page.getByLabel('Number of Dogs Playing*').click();
+//   await page.getByLabel('Number of Dogs Playing*').fill('3');
+
+    //.product-add-to-cart
+    //.product-options.product-options-list 
+    //.custom-control //.custom-radio
+        //type radio .custom-control-input
+        //.custom-control-label  text gets us the time
+        //we can click on this to check the radio box
+    //we will need the radio button
+    //we will need the checkout button    
+
+    }
+    return [2,4,6,7]
+}
 
 async function run(){
-    await scrapePark('https://hawspets.givecloud.co/dog-park')
+//    await scrapeTimes('https://hawspets.givecloud.co/product/SCADPAPR222024/sca-private-dog-park-april-22')
+    // await scrapePark('https://hawspets.givecloud.co/dog-park')
 }
 
 run();
+console.log(cleanTimes([
+    '8:00-8:45 AM\n\n$20.00 (Booked)',
+    '9:00-9:45 AM\n\n$20.00 (Booked)',
+    '10:00 AM - 10:45AM\n\n$20.00 (Booked)',
+    '11:00 - 11:45 AM\n\n$20.00 (Booked)',
+    '3:00PM-3:45 PM\n\n$20.00 (Booked)',
+    '4:00-4:45 PM\n\n$20.00 (Booked)',
+    '5:00-5:45 PM\n\n$20.00 (Booked)',
+    '6:00-6:45 PM\n\n$20.00 (Booked)',
+    '7:00-7:45 PM\n\n$20.00'
+  ]))
