@@ -69,6 +69,7 @@ async function scrapePark(url:string){
     }
 
     console.log(days)
+    // console.log(days)
     for(let i = 0; i< days.length; i++){
         let day = days[i];
         if(!day.sold_out){
@@ -82,6 +83,7 @@ async function scrapePark(url:string){
 
     console.log(days)
     console.log('done scraping')
+    return days;
 }
 
 function cleanTimes(arr:string[]){
@@ -107,49 +109,75 @@ async function scrapeTimes(url:string|null):Promise<any>{
     //get rid of pop up modal
     await page.getByRole('button', { name: 'Close' }).click();
 
-    //gets all of the available dates
-    let foo = cleanTimes(await page.locator('.product-add-to-cart .product-options .custom-control .custom-control-label').allInnerTexts())
-    //foo needs to be added to the object
-    console.log(foo);
+    //gets all of the available timeslots
+    let times = cleanTimes(await page.locator('.product-add-to-cart .product-options .custom-control .custom-control-label').allInnerTexts())
 
     browser.close()
-    return foo
+    return times;
 
-//   await page.getByText('7:00-7:45 PM $').click();
-//   await page.getByRole('button', { name: ' Add to Cart' }).click();
-//   await page.getByLabel('Number of Dogs Playing*').click();
-//   await page.getByLabel('Number of Dogs Playing*').fill('3');
-
-    //.product-add-to-cart
-    //.product-options.product-options-list 
-    //.custom-control //.custom-radio
-        //type radio .custom-control-input
-        //.custom-control-label  text gets us the time
-        //we can click on this to check the radio box
-    //we will need the radio button
-    //we will need the checkout button    
 
     }
-    return [2,4,6,7]
+    throw new Error('expected a url and there was none');
+    return 'err';
 }
+
+// async function bookParkDay(url:string, date:string, time:string):Promise<void>{
+//     const browser = await playwright.chromium.launch({
+//         headless: true,//true == no ui
+//     })
+//     const page = await browser.newPage();
+//     await page.goto(url);
+
+//     //get rid of pop up modal
+//     await page.getByRole('button', { name: 'Close' }).click();
+// }
 
 async function run(){
 //    await scrapeTimes('https://hawspets.givecloud.co/product/SCADPAPR222024/sca-private-dog-park-april-22')
-   await scrapePark('https://hawspets.givecloud.co/dog-park')
+    let desired = [
+        {
+            date: 'April 21',
+            time: '7:00-7:45PM'
+        },
+        {
+            date: 'April 25',
+            time: '7:00-7:45PM'
+        },
+        {
+            date: 'April 30',
+            time: '7:00-7:45PM'
+        },
+    ]
+
+    let parkData = await scrapePark('https://hawspets.givecloud.co/dog-park');
+
+
+    //check booking
+    for(let i = 0; i < desired.length; i++){
+        let desiredDay = desired[i];
+        for(let j = 0; j < parkData.length; j++){
+            let day = parkData[j];
+            if(!day.sold_out && day.date === desiredDay.date){
+                if(!day.times[desiredDay.time].booked){
+                    console.log('made it in here')
+                    console.log(day) 
+                    try{
+                        //actually go in and book that shit  
+                        //
+                        
+
+                    }catch(e){
+                        break;
+                    }
+
+                }
+
+            }
+        }
+    }
 }
 
 run();
-// console.log(cleanTimes([
-//     '8:00-8:45 AM\n\n$20.00 (Booked)',
-//     '9:00-9:45 AM\n\n$20.00 (Booked)',
-//     '10:00 AM - 10:45AM\n\n$20.00 (Booked)',
-//     '11:00 - 11:45 AM\n\n$20.00 (Booked)',
-//     '3:00PM-3:45 PM\n\n$20.00 (Booked)',
-//     '4:00-4:45 PM\n\n$20.00 (Booked)',
-//     '5:00-5:45 PM\n\n$20.00 (Booked)',
-//     '6:00-6:45 PM\n\n$20.00 (Booked)',
-//     '7:00-7:45 PM\n\n$20.00'
-//   ]))
 
 
 //todos
