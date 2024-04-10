@@ -121,16 +121,24 @@ async function scrapeTimes(url:string|null):Promise<any>{
     return 'err';
 }
 
-// async function bookParkDay(url:string, date:string, time:string):Promise<void>{
-//     const browser = await playwright.chromium.launch({
-//         headless: true,//true == no ui
-//     })
-//     const page = await browser.newPage();
-//     await page.goto(url);
+async function bookParkDay(url:string, date:string, time:string):Promise<void>{
+    const browser = await playwright.chromium.launch({
+        headless: true,//true == no ui
+    })
+    const page = await browser.newPage();
+    await page.goto(url);
 
-//     //get rid of pop up modal
-//     await page.getByRole('button', { name: 'Close' }).click();
-// }
+    //get rid of pop up modal
+    await page.getByRole('button', { name: 'Close' }).click();
+
+    //click time slot
+    //click on # of dogs and fill to 3
+    //agree to terms and other btn
+    //add to cart
+
+    //go to cart
+
+}
 
 async function run(){
 //    await scrapeTimes('https://hawspets.givecloud.co/product/SCADPAPR222024/sca-private-dog-park-april-22')
@@ -163,7 +171,7 @@ async function run(){
                     console.log(day) 
                     try{
                         //actually go in and book that shit  
-                        //
+                        await bookParkDay(day.url, desiredDay.date, desiredDay.time)
                         
 
                     }catch(e){
