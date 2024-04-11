@@ -127,6 +127,9 @@ async function bookParkDay(url:string, date:string, time:string):Promise<void>{
     const email = process.env.EMAIL || 'foo';
     const password = process.env.PASSWORD||'bar';
     const address = process.env.ADDRESS || 'baz';
+    const card_cvv = process.env.CARD_CVV||'foo';
+    const card_expiry = process.env.CARD_EXP||'foo';
+    const card_number = process.env.CARD_NUM||'foo';
 
     const browser = await playwright.chromium.launch({
         headless: false,//true == no ui
@@ -173,16 +176,17 @@ async function bookParkDay(url:string, date:string, time:string):Promise<void>{
         await page.locator('.pac-container .pac-item').click();
         await page.getByRole('button',{name:'Next'}).click();
 
+        //on card details page out page
+        //can either preset card details or do this
+        await page.locator('#inputPaymentNumber').fill(card_number);
+        await page.locator('#inputPaymentExpiry').fill(card_expiry);
+        await page.locator('#inputPaymentCVV').fill(card_cvv);
+        //not a robot
+        // await page.locator('#recaptcha-anchor-label').click()
+        //confirm payment
+        // await page.locator('#btn-pay').click()
+
     }
-    
-
-    //click time slot
-    //click on # of dogs and fill to 3
-    //agree to terms and other btn
-    //add to cart
-
-    //go to cart
-
 }
 
 async function run(){
@@ -235,7 +239,5 @@ async function run(){
 bookParkDay('https://hawspets.givecloud.co/product/SCADPAPR252024/sca-private-dog-park-april-25','April 25', '7:00-7:45')
 
 
-//todos
-//add the times to the array of dates
-//figure out how to actually book the shit
-//how to book with an array of days?
+//have it book just one
+//then have it book multiple
