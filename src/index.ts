@@ -1,10 +1,6 @@
 import playwright from 'playwright'
 import 'dotenv/config'
 
-console.log(process.env.EMAIL)
-
-
-
 let timeSlotArr = ['8:00-8:45AM','9:00-9:45AM','10:00-10:45AM','11:00-11:45AM','3:00-3:45PM','4:00-4:45PM','5:00-5:45PM','6:00-6:45PM','7:00-7:45PM']
 let timeSlots = {
     '8:00-8:45AM':{
@@ -130,6 +126,8 @@ async function scrapeTimes(url:string|null):Promise<any>{
 async function bookParkDay(url:string, date:string, time:string):Promise<void>{
     const email = process.env.EMAIL || 'foo';
     const password = process.env.PASSWORD||'bar';
+    const address = process.env.ADDRESS || 'baz';
+
     const browser = await playwright.chromium.launch({
         headless: false,//true == no ui
     })
@@ -138,17 +136,14 @@ async function bookParkDay(url:string, date:string, time:string):Promise<void>{
 
     //get rid of pop up modal
     await page.getByRole('button', { name: 'Close' }).click();
-
-
   
     //clicks time slot
     console.log(time)
-    //this needs to be programatic
     await page.getByText(time).click();
 
     if(await page.getByText(time).isChecked()){
+        // on first page
         //clicks and fills # of dogs
-        await page.getByLabel('Number of Dogs Playing*').click();
         await page.getByLabel('Number of Dogs Playing*').fill('3');
     
         //accepting terms
@@ -159,18 +154,25 @@ async function bookParkDay(url:string, date:string, time:string):Promise<void>{
         await page.getByRole('button', { name: ' Add to Cart' }).click();
         await page.getByRole('link', { name: 'Continue to Payment ' }).click();
         
+        //this is a new page
         await page.getByRole('button', { name: 'Checkout ' }).click();
 
-        await page.locator('#inputLoginEmail').click()
+        //own page
+        // await page.locator('#inputLoginEmail').click()
         await page.locator('#inputLoginEmail').fill(email)
-        
-        
-        await page.locator('#inputLoginPassword').click()
+        // await page.locator('#inputLoginPassword').click()
         await page.locator('#inputLoginPassword').fill(password)
-
         await page.getByRole('button', { name: 'Login ' }).click();
 
+    
         await page.getByRole('button',{name:'Next'}).click();
+
+        //address and user details page
+        await page.waitForTimeout(3000);
+        await page.locator('#inputBillingAddress1').fill(address)
+        await page.locator('.pac-container .pac-item').click();
+        await page.getByRole('button',{name:'Next'}).click();
+
     }
     
 
