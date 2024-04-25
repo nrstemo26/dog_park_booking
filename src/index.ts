@@ -1,5 +1,9 @@
 import playwright from 'playwright'
 import 'dotenv/config'
+import checkAvailableDates from './checkAvailableDates'
+import readline from 'readline/promises';
+import dayjs from 'dayjs';
+// checkAvailableDates()
 
 let timeSlotArr = ['8:00-8:45AM','9:00-9:45AM','10:00-10:45AM','11:00-11:45AM','3:00-3:45PM','4:00-4:45PM','5:00-5:45PM','6:00-6:45PM','7:00-7:45PM']
 let timeSlots = {
@@ -31,7 +35,6 @@ let timeSlots = {
         available: false
     },
  }
-
 
 // npx playwright codegen https://hawspets.givecloud.co/dog-park
 async function scrapePark(url:string){ 
@@ -234,10 +237,85 @@ async function run(){
     }
 }
 
+async function getUserMonth(){
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    let currentMonthDays = [];
+    let nextMonthDays = '';
+    let now = dayjs();
+    let nextMonth = dayjs().month(now.month()+1)
+
+    // console.log(months[nextMonth.month()])
+    // console.log(nextMonth.daysInMonth())
+    
+    for(let i = now.date()+1; i <= now.daysInMonth(); i++){
+        currentMonthDays.push(i);
+    }
+    for(let i = 1; i <= nextMonth.daysInMonth(); i++){
+        let el:string = i.toString();
+        if(!(i === nextMonth.daysInMonth())){
+            el += ','
+        }
+        if(i%7 == 0){
+            el += '\n'
+        }else{
+            el += ' '
+        }
+        nextMonthDays+=el;
+    }
+
+
+
+    // console.log(now.date())
+    console.log(`Available days in ${months[now.month()]} `)
+    console.log(currentMonthDays.join(', '))
+    console.log(`Available days in ${months[nextMonth.month()]} `)
+    console.log(nextMonthDays)
+    // console.log(nextMonthDays.join(', ').match(/(?:\d+, ){6}\d+/g).join('\n'))
+
+
+}
+
+async function getUserInput(){
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+        terminal: false
+    });
+
+    // let days = Number(await rl.question('How many days do you want to book at the park? '))
+    // console.log(`${days} to book`)
+
+    getUserMonth()
+    // let now = dayjs();
+    // console.log(dayjs().month(now.month()).daysInMonth())
+    // for(let i=0; i<days; i++){
+        //ask month
+
+
+        //ask day of month
+        //ask time
+
+    // }
+
+    // rl.question('What is your name? ',(answer)=>{
+    //     console.log(`hello, ${answer}!`);
+
+    //     rl.close();
+    // } )
+}
+getUserInput();
+
+
+
+
+
+
 // run();
 
-bookParkDay('https://hawspets.givecloud.co/product/SCADPAPR252024/sca-private-dog-park-april-25','April 25', '7:00-7:45')
+// bookParkDay('https://hawspets.givecloud.co/product/SCADPAPR252024/sca-private-dog-park-april-25','April 25', '7:00-7:45')
 
 
 //have it book just one
+//have it watch to check when it acutally uploads the new dates
+//have it check every 10 minutes on the 25th of every month then log some shit
 //then have it book multiple
