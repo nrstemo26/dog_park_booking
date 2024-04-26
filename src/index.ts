@@ -238,41 +238,55 @@ async function run(){
 }
 
 async function getUserMonth(){
+    function makeCalendar(start, end, offset){
+        let dayStr = ''
+
+        for(let i = 0; i<offset; i++){
+            dayStr += 'xx || '
+        }
+        for(let i = start; i <= end; i++){
+            let el:string = i.toString() + ' ||';
+            if(i< 10){
+                el = ' ' + el;
+            }
+            if((i - offset -1) % 7 == 0) {
+
+                el += '\n'
+            }else{
+                el += ' '
+            }
+            dayStr += el;
+        }
+        return dayStr;
+    }
+
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-    let currentMonthDays = [];
+    
+    let currentMonthDays = '';
     let nextMonthDays = '';
     let now = dayjs();
+    let nowOffset = now.day();
+
     let nextMonth = dayjs().month(now.month()+1)
+    let firstOfNextMonth = nextMonth.date(1)
+    let nextMonthOffset = firstOfNextMonth.day();
+
+
+    // offset days based on day of week
+    //
 
     // console.log(months[nextMonth.month()])
     // console.log(nextMonth.daysInMonth())
-    
-    for(let i = now.date()+1; i <= now.daysInMonth(); i++){
-        currentMonthDays.push(i);
-    }
-    for(let i = 1; i <= nextMonth.daysInMonth(); i++){
-        let el:string = i.toString();
-        if(!(i === nextMonth.daysInMonth())){
-            el += ','
-        }
-        if(i%7 == 0){
-            el += '\n'
-        }else{
-            el += ' '
-        }
-        nextMonthDays+=el;
-    }
 
+    currentMonthDays =  makeCalendar(now.date(), now.daysInMonth(), nowOffset)
+    nextMonthDays =  makeCalendar(1, nextMonth.daysInMonth(), nextMonthOffset)
 
-
-    // console.log(now.date())
-    console.log(`Available days in ${months[now.month()]} `)
-    console.log(currentMonthDays.join(', '))
-    console.log(`Available days in ${months[nextMonth.month()]} `)
+    console.log(months[now.month()])
+    console.log(`Su || Mo || Tu || We || Th || Fr || Sa ||`)
+    console.log(currentMonthDays)
+    console.log(months[nextMonth.month()])
+    console.log('Su || Mo || Tu || We || Th || Fr || Sa ||')
     console.log(nextMonthDays)
-    // console.log(nextMonthDays.join(', ').match(/(?:\d+, ){6}\d+/g).join('\n'))
-
-
 }
 
 async function getUserInput(){
