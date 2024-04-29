@@ -272,18 +272,39 @@ async function getUserInput(){
         output: process.stdout,
         terminal: false
     });
+    async function askTime(){
+        let timeSlotArr = ['8:00-8:45AM','9:00-9:45AM','10:00-10:45AM','11:00-11:45AM','3:00-3:45PM','4:00-4:45PM','5:00-5:45PM','6:00-6:45PM','7:00-7:45PM']
+
+
+    }
 
     async function askMonth(months){
-        let answer = await rl.question('Which month do you want to book for? ')
 
-        if(months.includes(answer.toLowerCase())){
-            console.log('you anwered ' + answer);
-            rl.close()
-            return answer;
+        let monthSelection = await rl.question('Which month do you want to book for? ')
+
+        if(months.map(el=>el.name).includes(monthSelection.toLowerCase())){
+            console.log('you anwered ' + monthSelection);
+            // rl.close()
         }else{
             console.log('Please answer a valid month')
             askMonth(months);
         }
+
+        let daySelection = await rl.question('which day do you want to select? ');
+
+
+        let element = months.find(item => item.name === monthSelection)
+        if(daySelection >= element.start_day && daySelection <= element.end_day){
+            console.log('you answered ', daySelection);
+        }else{
+            console.log('not a valid day')
+            askMonth(months);
+        }
+        return {
+            month: monthSelection,
+            day: daySelection
+        }
+
     }
 
     const months = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december']
@@ -301,10 +322,18 @@ async function getUserInput(){
     // console.log(`${days} to book`)
 
     displayCalendar(now, nowOffset, currentMonthName, nextMonth, nextMonthOffset, nextMonthName)
-    let month = await askMonth([currentMonthName, nextMonthName])
-    
-    //ask for day of month
-
+    let month = await askMonth([
+    {
+        name:currentMonthName,
+        start_day: now.day(),
+        end_day: now.daysInMonth(),
+    }, {
+        name: nextMonthName,
+        start_day: 1,
+        end_day: nextMonth.daysInMonth(),
+    }])
+ 
+    let time = await askTime()
     //ask for time of day
 
 
