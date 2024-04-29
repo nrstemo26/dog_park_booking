@@ -237,7 +237,7 @@ async function run(){
     }
 }
 
-async function displayCalendar(){
+async function displayCalendar(now, nowOffset, currentMonthName, nextMonth, nextMonthOffset, nextMonthName){
     function makeCalendar(start:number, end:number, offset:number):string{
         let dayStr = `Su || Mo || Tu || We || Th || Fr || Sa ||\n`
 
@@ -260,17 +260,9 @@ async function displayCalendar(){
         return dayStr;
     }
 
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-    let now = dayjs();
-    let nowOffset = now.day();
-
-    let nextMonth = dayjs().month(now.month() + 1)
-    let firstOfNextMonth = nextMonth.date(1)
-    let nextMonthOffset = firstOfNextMonth.day();
-
-    console.log(months[now.month()])
+    console.log(currentMonthName)
     console.log(makeCalendar(now.date(), now.daysInMonth(), nowOffset))
-    console.log(months[nextMonth.month()])
+    console.log(nextMonthName)
     console.log(makeCalendar(1, nextMonth.daysInMonth(), nextMonthOffset))
 }
 
@@ -281,11 +273,35 @@ async function getUserInput(){
         terminal: false
     });
 
+    async function askMonth(months){
+        let answer = await rl.question('Which month do you want to book for? ')
+
+        if(months.includes(answer.toLowerCase())){
+            console.log('you anwered ' + answer);
+            rl.close()
+            return answer;
+        }else{
+            console.log('Please answer a valid month')
+            askMonth(months);
+        }
+    }
+
+    const months = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december']
+    
+    let now = dayjs();
+    let nowOffset = now.day();
+    let currentMonthName = months[now.month()]
+
+    let nextMonth = dayjs().month(now.month() + 1)
+    let firstOfNextMonth = nextMonth.date(1)//gets day of week shit
+    let nextMonthOffset = firstOfNextMonth.day();
+    let nextMonthName = months[nextMonth.month()]
+
     // let days = Number(await rl.question('How many days do you want to book at the park? '))
     // console.log(`${days} to book`)
 
-    displayCalendar()
-    //ask for month
+    displayCalendar(now, nowOffset, currentMonthName, nextMonth, nextMonthOffset, nextMonthName)
+    let month = await askMonth([currentMonthName, nextMonthName])
     
     //ask for day of month
 
