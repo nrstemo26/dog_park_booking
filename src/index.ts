@@ -237,9 +237,9 @@ async function run(){
     }
 }
 
-async function getUserMonth(){
-    function makeCalendar(start, end, offset){
-        let dayStr = ''
+async function displayCalendar(){
+    function makeCalendar(start:number, end:number, offset:number):string{
+        let dayStr = `Su || Mo || Tu || We || Th || Fr || Sa ||\n`
 
         for(let i = 0; i<offset; i++){
             dayStr += 'xx || '
@@ -261,32 +261,17 @@ async function getUserMonth(){
     }
 
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-    
-    let currentMonthDays = '';
-    let nextMonthDays = '';
     let now = dayjs();
     let nowOffset = now.day();
 
-    let nextMonth = dayjs().month(now.month()+1)
+    let nextMonth = dayjs().month(now.month() + 1)
     let firstOfNextMonth = nextMonth.date(1)
     let nextMonthOffset = firstOfNextMonth.day();
 
-
-    // offset days based on day of week
-    //
-
-    // console.log(months[nextMonth.month()])
-    // console.log(nextMonth.daysInMonth())
-
-    currentMonthDays =  makeCalendar(now.date(), now.daysInMonth(), nowOffset)
-    nextMonthDays =  makeCalendar(1, nextMonth.daysInMonth(), nextMonthOffset)
-
     console.log(months[now.month()])
-    console.log(`Su || Mo || Tu || We || Th || Fr || Sa ||`)
-    console.log(currentMonthDays)
+    console.log(makeCalendar(now.date(), now.daysInMonth(), nowOffset))
     console.log(months[nextMonth.month()])
-    console.log('Su || Mo || Tu || We || Th || Fr || Sa ||')
-    console.log(nextMonthDays)
+    console.log(makeCalendar(1, nextMonth.daysInMonth(), nextMonthOffset))
 }
 
 async function getUserInput(){
@@ -299,24 +284,18 @@ async function getUserInput(){
     // let days = Number(await rl.question('How many days do you want to book at the park? '))
     // console.log(`${days} to book`)
 
-    getUserMonth()
-    // let now = dayjs();
-    // console.log(dayjs().month(now.month()).daysInMonth())
-    // for(let i=0; i<days; i++){
-        //ask month
+    displayCalendar()
+    //ask for month
+    
+    //ask for day of month
+
+    //ask for time of day
 
 
-        //ask day of month
-        //ask time
-
-    // }
-
-    // rl.question('What is your name? ',(answer)=>{
-    //     console.log(`hello, ${answer}!`);
-
-    //     rl.close();
-    // } )
+    
 }
+
+
 getUserInput();
 
 
