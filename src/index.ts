@@ -2,6 +2,7 @@ import playwright from 'playwright'
 import 'dotenv/config'
 import checkAvailableDates from './checkAvailableDates'
 import readline from 'readline/promises';
+
 import dayjs from 'dayjs';
 // checkAvailableDates()
 
@@ -274,7 +275,22 @@ async function getUserInput(){
     });
     async function askTime(){
         let timeSlotArr = ['8:00-8:45AM','9:00-9:45AM','10:00-10:45AM','11:00-11:45AM','3:00-3:45PM','4:00-4:45PM','5:00-5:45PM','6:00-6:45PM','7:00-7:45PM']
+        let timeSlotStr = timeSlotArr.map((el,index)=> {
 
+            return `${index + 1}) ${el}`
+        })
+        console.log(timeSlotArr.length)
+        let time = Number(await rl.question(`Which time do you want to select? \n${timeSlotStr.join('\n')}\n`));
+        // display time slots
+        if(time > 0 && time < 10){
+            //the number is valid
+            console.log('confirm time of ' + timeSlotArr[time-1])
+        }else{
+            console.log('not a valid answer')
+            console.log('not a valid answer')
+            askTime();
+        }
+        
 
     }
 
@@ -322,16 +338,16 @@ async function getUserInput(){
     // console.log(`${days} to book`)
 
     displayCalendar(now, nowOffset, currentMonthName, nextMonth, nextMonthOffset, nextMonthName)
-    let month = await askMonth([
-    {
-        name:currentMonthName,
-        start_day: now.day(),
-        end_day: now.daysInMonth(),
-    }, {
-        name: nextMonthName,
-        start_day: 1,
-        end_day: nextMonth.daysInMonth(),
-    }])
+    // let month = await askMonth([
+    // {
+    //     name:currentMonthName,
+    //     start_day: now.day(),
+    //     end_day: now.daysInMonth(),
+    // }, {
+    //     name: nextMonthName,
+    //     start_day: 1,
+    //     end_day: nextMonth.daysInMonth(),
+    // }])
  
     let time = await askTime()
     //ask for time of day
