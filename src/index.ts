@@ -273,6 +273,17 @@ async function getUserInput(){
         output: process.stdout,
         terminal: false
     });
+
+    async function askYorN(timeSlot){
+        let bool = await rl.question('confirm time of ' + timeSlot + '? (y or n) ');
+        if(bool === 'y' || bool === 'n'){
+            if(bool === 'y') return timeSlot;
+            if(bool === 'n') return askTime();
+        }else{
+            return askYorN(timeSlot);
+        }
+    }
+
     async function askTime(){
         let timeSlotArr = ['8:00-8:45AM','9:00-9:45AM','10:00-10:45AM','11:00-11:45AM','3:00-3:45PM','4:00-4:45PM','5:00-5:45PM','6:00-6:45PM','7:00-7:45PM']
         let timeSlotStr = timeSlotArr.map((el,index)=> {
@@ -283,13 +294,13 @@ async function getUserInput(){
         let time = Number(await rl.question(`Which time do you want to select? \n${timeSlotStr.join('\n')}\n`));
         // display time slots
         if(time > 0 && time < 10){
-            //the number is valid
-            console.log('confirm time of ' + timeSlotArr[time-1])
+            await askYorN(timeSlotArr[time-1])
         }else{
-            console.log('not a valid answer')
             console.log('not a valid answer')
             askTime();
         }
+        return timeSlotArr[time-1];
+
         
 
     }
@@ -350,6 +361,7 @@ async function getUserInput(){
     // }])
  
     let time = await askTime()
+    console.log(time)
     //ask for time of day
 
 
